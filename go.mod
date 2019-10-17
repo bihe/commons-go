@@ -1,4 +1,4 @@
-module github.com/bihe/commons
+module github.com/bihe/commons-go
 
 go 1.13
 
