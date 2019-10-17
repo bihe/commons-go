@@ -9,8 +9,9 @@ import (
 // see https://github.com/goenning/go-cache-demo/blob/master/LICENSE
 // initially created by: https://github.com/goenning
 
-func newMemCache(duration time.Duration) *memoryCache {
-	return &memoryCache{
+// NewMemCache create a cache with the given TTL
+func NewMemCache(duration time.Duration) *MemoryCache {
+	return &MemoryCache{
 		items:         make(map[string]cacheItem),
 		cacheDuration: duration,
 	}
@@ -20,13 +21,15 @@ func newMemCache(duration time.Duration) *memoryCache {
 // memoryCache to store User objects
 // --------------------------------------------------------------------------
 
-type memoryCache struct {
+// MemoryCache implements a simple cache
+type MemoryCache struct {
 	sync.Mutex
 	items         map[string]cacheItem
 	cacheDuration time.Duration
 }
 
-func (s *memoryCache) get(key string) *User {
+// Get returns an Userobject by the given key
+func (s *MemoryCache) Get(key string) *User {
 	s.Lock()
 	defer s.Unlock()
 
@@ -38,7 +41,8 @@ func (s *memoryCache) get(key string) *User {
 	return item.user
 }
 
-func (s *memoryCache) set(key string, user *User) {
+// Set puts an Userobject into the cache
+func (s *MemoryCache) Set(key string, user *User) {
 	s.Lock()
 	defer s.Unlock()
 

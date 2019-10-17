@@ -12,15 +12,15 @@ import (
 const key = "MY_KEY"
 
 func TestMemCacheGetEmpty(t *testing.T) {
-	cache := newMemCache(parse("5s"))
-	user := cache.get(key)
+	cache := NewMemCache(parse("5s"))
+	user := cache.Get(key)
 	if user != nil {
 		t.Fatalf("exptected empty/nil user!")
 	}
 }
 
 func TestMemCacheGetValue(t *testing.T) {
-	cache := newMemCache(parse("5s"))
+	cache := NewMemCache(parse("5s"))
 	u := User{
 		DisplayName: "a",
 		Email:       "a.b@c.de",
@@ -28,8 +28,8 @@ func TestMemCacheGetValue(t *testing.T) {
 		Username:    "u",
 		Roles:       []string{"role"},
 	}
-	cache.set(key, &u)
-	user := cache.get(key)
+	cache.Set(key, &u)
+	user := cache.Get(key)
 	if user == nil {
 		t.Fatalf("exptected cached used got nil!")
 	}
@@ -39,7 +39,7 @@ func TestMemCacheGetValue(t *testing.T) {
 }
 
 func TestMemCacheGetExpiredValue(t *testing.T) {
-	cache := newMemCache(parse("1s"))
+	cache := NewMemCache(parse("1s"))
 	u := User{
 		DisplayName: "a",
 		Email:       "a.b@c.de",
@@ -47,11 +47,11 @@ func TestMemCacheGetExpiredValue(t *testing.T) {
 		Username:    "u",
 		Roles:       []string{"role"},
 	}
-	cache.set(key, &u)
+	cache.Set(key, &u)
 
 	time.Sleep(parse("1s200ms"))
 
-	user := cache.get(key)
+	user := cache.Get(key)
 	if user != nil {
 		t.Fatalf("exptected expiry of user object!")
 	}
