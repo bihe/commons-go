@@ -1,3 +1,5 @@
+// Package persistence simplifies the database ineraction by providing helper functions
+// it uses sqlx internally
 package persistence
 
 import (
@@ -49,10 +51,16 @@ func HandleTX(complete bool, atomic *Atomic, err error) error {
 		case nil:
 			return atomic.Commit()
 		default:
-			log.Errorf("could not complete the transaction: %v", err)
-			if e := atomic.Rollback(); e != nil {
-				return fmt.Errorf("%v; could not rollback transaction: %v", err, e)
+			log.Errorf("could not complete the tx: %v", err)
+			if atomic != nil {
+				log.Debugf("will try to rollback the tx")
+				if e := atomic.Rollback(); e != nil {
+					return fmt.Errorf("%v; could not rollback tx: %v", err, e)
+				}
+			} else {
+				log.Warnf("cannot rollback the tx, no atomic object available")
 			}
+
 		}
 	}
 	return err
