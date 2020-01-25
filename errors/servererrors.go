@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/bihe/commons-go/config"
 	"github.com/bihe/commons-go/cookies"
 	"github.com/markusthoemmes/goautoneg"
 
@@ -19,8 +18,22 @@ const (
 	TEXT content = iota
 	// JSON content-type requested by client
 	JSON
-	// HTML content-type requested by cleint
+	// HTML content-type requested by client
 	HTML
+)
+
+const (
+	// DefaultCookieExpiry is the default expiry time of a cookie
+	DefaultCookieExpiry = 60
+
+	// FlashKeyError is used as a flash message for errors
+	FlashKeyError = "flash_error"
+
+	// FlashKeyInfo is used as a key for flash messages
+	FlashKeyInfo = "flash_info"
+
+	// ErrorPath defines the URL-path for errors
+	DefaultErrorPath = "error"
 )
 
 // --------------------------------------------------------------------------
@@ -31,6 +44,7 @@ const (
 //
 // "Note that both "type" and "instance" accept relative URIs; this means
 // that they must be resolved relative to the document's base URI"
+// swagger:model
 type ProblemDetail struct {
 	// Type is a URI reference [RFC3986] that identifies the
 	// problem type.  This specification encourages that, when
@@ -170,12 +184,19 @@ func ErrRedirectError(err RedirectError) *ProblemDetail {
 
 // ErrorReporter handles sending of errors to clients respecting the context (Accept header)
 type ErrorReporter struct {
-	cookie *cookies.AppCookie
+	cookie    *cookies.AppCookie
+	errorPath string
 }
 
 // NewReporter creates a new instance of the ErrorReporter type
-func NewReporter(c cookies.Settings) *ErrorReporter {
-	r := ErrorReporter{cookie: cookies.NewAppCookie(c)}
+func NewReporter(c cookies.Settings, errorPath string) *ErrorReporter {
+	if errorPath == "" {
+		errorPath = DefaultErrorPath
+	}
+	r := ErrorReporter{
+		cookie:    cookies.NewAppCookie(c),
+		errorPath: errorPath,
+	}
 	return &r
 }
 
@@ -195,7 +216,7 @@ func (e *ErrorReporter) Negotiate(w http.ResponseWriter, r *http.Request, err er
 		pd = ErrRedirectError(redirect)
 		switch content {
 		case HTML:
-			e.cookie.Set(config.FlashKeyError, pd.Detail, config.CookieDefaultExp, w)
+			e.cookie.Set(FlashKeyError, pd.Detail, DefaultCookieExpiry, w)
 			http.Redirect(w, r, redirect.URL, http.StatusTemporaryRedirect)
 			break
 		default:
@@ -223,8 +244,8 @@ func (e *ErrorReporter) Negotiate(w http.ResponseWriter, r *http.Request, err er
 
 	switch content {
 	case HTML:
-		e.cookie.Set(config.FlashKeyError, pd.Detail, config.CookieDefaultExp, w)
-		http.Redirect(w, r, config.ErrorPath, http.StatusTemporaryRedirect)
+		e.cookie.Set(FlashKeyError, pd.Detail, DefaultCookieExpiry, w)
+		http.Redirect(w, r, e.errorPath, http.StatusTemporaryRedirect)
 		break
 	default:
 		status := http.StatusTemporaryRedirect

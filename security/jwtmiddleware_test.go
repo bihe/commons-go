@@ -16,7 +16,7 @@ import (
 const cookie = "cookie"
 const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE4NzAzOTI2NDcsImp0aSI6IjZmYWQ1YzAwLWZlZTItNDU5Yy1hYmFkLTIwNDU3Y2ZmM2Q4YSIsImlhdCI6MTU1OTc4Nzg0NywiaXNzIjoiaXNzdWVyIiwic3ViIjoidXNlciIsIlR5cGUiOiJsb2dpbi5Vc2VyIiwiRGlzcGxheU5hbWUiOiJEaXNwbGF5IE5hbWUiLCJFbWFpbCI6ImEuYkBjLmRlIiwiVXNlcklkIjoiMTIzNDUiLCJVc2VyTmFtZSI6ImEuYkBjLmRlIiwiR2l2ZW5OYW1lIjoiRGlzcGxheSIsIlN1cm5hbWUiOiJOYW1lIiwiQ2xhaW1zIjpbImNsYWltfGh0dHA6Ly9sb2NhbGhvc3Q6MzAwMHxyb2xlIl19.qUwvHXBmV_FuwLtykOnzu3AMbxSqrg82bQlAi3Nabyo"
 const path = "/JWT"
-const unmarshall = "could not unmarshall problemdetails: %v"
+const unmarshal = "could not unmarshal problemdetails: %v"
 
 var jwtOpts = JwtOptions{
 	JwtSecret:  "secret",
@@ -122,7 +122,7 @@ func TestJWTMiddlewareNoToken(t *testing.T) {
 	var p errors.ProblemDetail
 	err := json.Unmarshal(rec.Body.Bytes(), &p)
 	if err != nil {
-		t.Errorf(unmarshall, err)
+		t.Errorf(unmarshal, err)
 	}
 	assert.Equal(t, http.StatusUnauthorized, p.Status)
 }
@@ -145,7 +145,7 @@ func TestJWTMiddlewareWrongToken(t *testing.T) {
 	var p errors.ProblemDetail
 	err := json.Unmarshal(rec.Body.Bytes(), &p)
 	if err != nil {
-		t.Errorf(unmarshall, err)
+		t.Errorf(unmarshal, err)
 	}
 	assert.Equal(t, http.StatusUnauthorized, p.Status)
 }

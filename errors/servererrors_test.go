@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const errText = "error occured"
+const errText = "error occurred"
 
 func TestErrorHandler(t *testing.T) {
 	// Setup
@@ -96,7 +96,7 @@ func TestErrorHandler(t *testing.T) {
 		Domain: "localhost",
 		Secure: false,
 		Prefix: "__",
-	})
+	}, "error")
 
 	for _, tc := range testcases {
 		t.Run(tc.Name, func(t *testing.T) {

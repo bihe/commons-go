@@ -18,7 +18,7 @@ type JwtOptions struct {
 	JwtSecret string
 	// JwtIssuer specifies identifies the principal that issued the token
 	JwtIssuer string
-	// CookieName spedifies the HTTP cookie holding the token
+	// CookieName specifies the HTTP cookie holding the token
 	CookieName string
 	// RequiredClaim to access the application
 	RequiredClaim Claim
@@ -26,11 +26,13 @@ type JwtOptions struct {
 	RedirectURL string
 	// CacheDuration defines the duration to cache the JWT token result
 	CacheDuration string
+	// ErrorPath is used if html errors are returned to the client
+	ErrorPath string
 }
 
-// Claim defines the authorization requiremenets
+// Claim defines the authorization requirements
 type Claim struct {
-	// Name of the applicatiion
+	// Name of the application
 	Name string
 	// URL of the application
 	URL string

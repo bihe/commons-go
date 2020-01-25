@@ -1,3 +1,5 @@
+// Package security implements authentication / authorization by means of JWT tokens
+
 package security
 
 import (
@@ -8,10 +10,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bihe/commons-go/config"
 	"github.com/bihe/commons-go/cookies"
 	"github.com/bihe/commons-go/errors"
 	log "github.com/sirupsen/logrus"
+)
+
+const (
+	// UserKey defines an authenticated user object stored in the context
+	UserKey = "context_user"
+
+	// DefaultErrorPath specifies the url-path where the HTML errors are displayed
+	DefaultErrorPath = "error"
 )
 
 // JwtMiddleware is used to authenticate a user based on a token
@@ -26,7 +35,7 @@ type JwtMiddleware struct {
 func NewJwtMiddleware(options JwtOptions, settings cookies.Settings) *JwtMiddleware {
 	m := JwtMiddleware{
 		jwt:    options,
-		errRep: errors.NewReporter(settings),
+		errRep: errors.NewReporter(settings, DefaultErrorPath),
 	}
 	return &m
 }
@@ -38,6 +47,11 @@ func (j *JwtMiddleware) JwtContext(next http.Handler) http.Handler {
 
 func handleJWT(next http.Handler, options JwtOptions, errRep *errors.ErrorReporter) http.Handler {
 	cache := NewMemCache(parseDuration(options.CacheDuration))
+	errorPath := options.ErrorPath
+	if errorPath == "" {
+		errorPath = DefaultErrorPath
+	}
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var (
 			err   error
@@ -58,7 +72,7 @@ func handleJWT(next http.Handler, options JwtOptions, errRep *errors.ErrorReport
 					Status:  http.StatusUnauthorized,
 					Err:     fmt.Errorf("invalid authentication, no JWT token present"),
 					Request: r,
-					URL:     options.RedirectURL + config.ErrorPath,
+					URL:     options.RedirectURL + errorPath,
 				})
 				return
 			}
@@ -71,7 +85,7 @@ func handleJWT(next http.Handler, options JwtOptions, errRep *errors.ErrorReport
 		u := cache.Get(token)
 		if u != nil {
 			// cache hit, put the user in the context
-			ctx := context.WithValue(r.Context(), config.User, u)
+			ctx := context.WithValue(r.Context(), UserKey, u)
 			next.ServeHTTP(w, r.WithContext(ctx))
 			return
 		}
@@ -83,7 +97,7 @@ func handleJWT(next http.Handler, options JwtOptions, errRep *errors.ErrorReport
 				Status:  http.StatusUnauthorized,
 				Err:     fmt.Errorf("invalid authentication, could not parse the JWT token: %v", err),
 				Request: r,
-				URL:     options.RedirectURL + config.ErrorPath,
+				URL:     options.RedirectURL + errorPath,
 			})
 			return
 		}
@@ -95,7 +109,7 @@ func handleJWT(next http.Handler, options JwtOptions, errRep *errors.ErrorReport
 				Status:  http.StatusForbidden,
 				Err:     fmt.Errorf("Invalid authorization: %v", err),
 				Request: r,
-				URL:     options.RedirectURL + config.ErrorPath,
+				URL:     options.RedirectURL + errorPath,
 			})
 			return
 		}
@@ -110,7 +124,7 @@ func handleJWT(next http.Handler, options JwtOptions, errRep *errors.ErrorReport
 		}
 		cache.Set(token, &user)
 
-		ctx := context.WithValue(r.Context(), config.User, &user)
+		ctx := context.WithValue(r.Context(), UserKey, &user)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
