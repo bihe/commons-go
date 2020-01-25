@@ -6,7 +6,6 @@ import (
 
 	"github.com/bihe/commons-go/security"
 	"github.com/go-chi/render"
-	log "github.com/sirupsen/logrus"
 )
 
 // --------------------------------------------------------------------------
@@ -78,7 +77,7 @@ type AppInfoHandler struct {
 //     schema:
 //       "$ref": "#/definitions/ProblemDetail"
 func (a *AppInfoHandler) HandleAppInfo(user security.User, w http.ResponseWriter, r *http.Request) error {
-	log.WithField("func", "api.HandleAppInfo").Debugf("return the application metadata info")
+	LogFunction("handler.HandleAppInfo").Debugf("return the application metadata info")
 	info := Meta{
 		Version: fmt.Sprintf("%s-%s", a.Version, a.Build),
 		UserInfo: UserInfo{
@@ -87,6 +86,5 @@ func (a *AppInfoHandler) HandleAppInfo(user security.User, w http.ResponseWriter
 			Roles:       user.Roles,
 		},
 	}
-	render.Render(w, r, AppInfoResponse{Meta: &info})
-	return nil
+	return render.Render(w, r, AppInfoResponse{Meta: &info})
 }
