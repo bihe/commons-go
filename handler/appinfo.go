@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/bihe/commons-go/security"
@@ -15,15 +14,25 @@ import (
 // Meta specifies application metadata
 // swagger:model
 type Meta struct {
-	Version string `json:"version"`
-	UserInfo
+	UserInfo UserInfo    `json:"userInfo"`
+	Version  VersionInfo `json:"versionInfo"`
 }
 
 // UserInfo provides information about the currently logged-in user
+// swagger:model
 type UserInfo struct {
-	Email       string   `json:"email"`
 	DisplayName string   `json:"displayName"`
+	UserID      string   `json:"userId"`
+	UserName    string   `json:"userName"`
+	Email       string   `json:"email"`
 	Roles       []string `json:"roles"`
+}
+
+// VersionInfo is used to provide version and build
+// swagger:model
+type VersionInfo struct {
+	Version string `json:"version"`
+	Build   string `json:"buildNumber"`
 }
 
 // --------------------------------------------------------------------------
@@ -79,8 +88,13 @@ type AppInfoHandler struct {
 func (a *AppInfoHandler) HandleAppInfo(user security.User, w http.ResponseWriter, r *http.Request) error {
 	LogFunction("handler.HandleAppInfo").Debugf("return the application metadata info")
 	info := Meta{
-		Version: fmt.Sprintf("%s-%s", a.Version, a.Build),
+		Version: VersionInfo{
+			Version: a.Version,
+			Build:   a.Build,
+		},
 		UserInfo: UserInfo{
+			UserID:      user.UserID,
+			UserName:    user.Username,
 			Email:       user.Email,
 			DisplayName: user.DisplayName,
 			Roles:       user.Roles,

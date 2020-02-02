@@ -64,7 +64,8 @@ func TestGetAppInfo(t *testing.T) {
 		t.Errorf("could not get valid json: %v", err)
 	}
 
-	assert.Equal(t, "1-2", m.Version)
+	assert.Equal(t, "1", m.Version.Version)
+	assert.Equal(t, "2", m.Version.Build)
 }
 
 func TestGetAppInfoNilUser(t *testing.T) {
