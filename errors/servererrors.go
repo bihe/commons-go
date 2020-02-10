@@ -31,9 +31,6 @@ const (
 
 	// FlashKeyInfo is used as a key for flash messages
 	FlashKeyInfo = "flash_info"
-
-	// ErrorPath defines the URL-path for errors
-	DefaultErrorPath = "error"
 )
 
 // --------------------------------------------------------------------------
@@ -184,24 +181,40 @@ func ErrRedirectError(err RedirectError) *ProblemDetail {
 
 // ErrorReporter handles sending of errors to clients respecting the context (Accept header)
 type ErrorReporter struct {
-	cookie    *cookies.AppCookie
-	errorPath string
+	CookieSettings cookies.Settings
+	ErrorPath      string
+
+	cookie *cookies.AppCookie
 }
 
-// NewReporter creates a new instance of the ErrorReporter type
-func NewReporter(c cookies.Settings, errorPath string) *ErrorReporter {
-	if errorPath == "" {
-		errorPath = DefaultErrorPath
+// defaultConfig checks the supplied config and uses reasonable defaults if nothing specific was defined
+func (e *ErrorReporter) defaultConfig(r *http.Request) {
+	// assume that application have an /error location
+	if e.ErrorPath == "" {
+		e.ErrorPath = "/error"
 	}
-	r := ErrorReporter{
-		cookie:    cookies.NewAppCookie(c),
-		errorPath: errorPath,
+
+	e.cookie = &cookies.AppCookie{
+		Settings: e.CookieSettings,
 	}
-	return &r
+
+	// work with the most often used values
+	if e.cookie.Settings.Path == "" {
+		e.cookie.Settings.Path = "/"
+	}
+	if e.cookie.Settings.Prefix == "" {
+		e.cookie.Settings.Prefix = "app"
+	}
+	if e.cookie.Settings.Domain == "" {
+		e.cookie.Settings.Domain = r.Host
+	}
 }
 
 // Negotiate respects content-types, sets the status code and returns error information
 func (e *ErrorReporter) Negotiate(w http.ResponseWriter, r *http.Request, err error) {
+	// not sure if a valid config was supplied, check and use defaults otherwise
+	e.defaultConfig(r)
+
 	var pd *ProblemDetail
 	content := negotiateContent(r)
 
@@ -245,7 +258,7 @@ func (e *ErrorReporter) Negotiate(w http.ResponseWriter, r *http.Request, err er
 	switch content {
 	case HTML:
 		e.cookie.Set(FlashKeyError, pd.Detail, DefaultCookieExpiry, w)
-		http.Redirect(w, r, e.errorPath, http.StatusTemporaryRedirect)
+		http.Redirect(w, r, e.ErrorPath, http.StatusTemporaryRedirect)
 		break
 	default:
 		status := http.StatusTemporaryRedirect

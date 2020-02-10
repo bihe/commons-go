@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/bihe/commons-go/cookies"
@@ -91,12 +92,13 @@ func TestErrorHandler(t *testing.T) {
 	}
 
 	r = chi.NewRouter()
-	errRep := NewReporter(cookies.Settings{
-		Path:   "/",
-		Domain: "localhost",
-		Secure: false,
-		Prefix: "__",
-	}, "error")
+	errRep := &ErrorReporter{
+		ErrorPath: "error",
+		CookieSettings: cookies.Settings{
+			Secure: false,
+			Prefix: "test",
+		},
+	}
 
 	for _, tc := range testcases {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -117,6 +119,8 @@ func TestErrorHandler(t *testing.T) {
 
 			if tc.Redirect != "" {
 				assert.Equal(t, tc.Redirect, rec.Header().Get("Location"))
+				// check that the correct cookie was set
+				assert.True(t, strings.Index(rec.Header().Get("Set-Cookie"), errRep.CookieSettings.Prefix+"_"+FlashKeyError) > -1)
 				return
 			}
 			s = string(rec.Body.Bytes())

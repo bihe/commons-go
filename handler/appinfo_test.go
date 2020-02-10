@@ -20,16 +20,13 @@ const (
 	build   = "2"
 )
 
-var cookieSettings = cookies.Settings{
-	Path:   "/",
-	Domain: "localhost",
-	Secure: false,
-	Prefix: "test",
-}
-
 var handler = &AppInfoHandler{
 	Handler: Handler{
-		ErrRep: errors.NewReporter(cookieSettings, "error"),
+		ErrRep: &errors.ErrorReporter{
+			CookieSettings: cookies.Settings{
+				Prefix: "test",
+			},
+		},
 	},
 	Version: version,
 	Build:   build,

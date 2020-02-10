@@ -34,8 +34,10 @@ type JwtMiddleware struct {
 // NewJwtMiddleware creates a new instance using the provided options
 func NewJwtMiddleware(options JwtOptions, settings cookies.Settings) *JwtMiddleware {
 	m := JwtMiddleware{
-		jwt:    options,
-		errRep: errors.NewReporter(settings, DefaultErrorPath),
+		jwt: options,
+		errRep: &errors.ErrorReporter{
+			CookieSettings: settings,
+		},
 	}
 	return &m
 }
