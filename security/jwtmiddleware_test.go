@@ -50,7 +50,6 @@ func TestJWTMiddlewareWrongJWTOptions(t *testing.T) {
 	assert.Panics(t, func() {
 		r.Use(jwt.JwtContext)
 		r.Get(path, func(w http.ResponseWriter, r *http.Request) {
-			return
 		})
 		r.ServeHTTP(rec, req)
 	}, "panics because of wrong duration!")
@@ -65,7 +64,6 @@ func TestJWTMiddlewareCookie(t *testing.T) {
 	req.AddCookie(&http.Cookie{Name: cookie, Value: token})
 	r.Use(jwt.JwtContext)
 	r.Get(path, func(w http.ResponseWriter, r *http.Request) {
-		return
 	})
 
 	r.ServeHTTP(rec, req)
@@ -81,7 +79,6 @@ func TestJWTMiddlewareCookieAndCache(t *testing.T) {
 	req.AddCookie(&http.Cookie{Name: cookie, Value: token})
 	r.Use(jwt.JwtContext)
 	r.Get(path, func(w http.ResponseWriter, r *http.Request) {
-		return
 	})
 
 	r.ServeHTTP(rec, req)
@@ -98,7 +95,6 @@ func TestJWTMiddlewareBearer(t *testing.T) {
 	req.Header.Add("Authorization", "Bearer "+token)
 	r.Use(jwt.JwtContext)
 	r.Get(path, func(w http.ResponseWriter, r *http.Request) {
-		return
 	})
 
 	r.ServeHTTP(rec, req)
@@ -113,7 +109,6 @@ func TestJWTMiddlewareNoToken(t *testing.T) {
 
 	r.Use(jwt.JwtContext)
 	r.Get(path, func(w http.ResponseWriter, r *http.Request) {
-		return
 	})
 
 	r.ServeHTTP(rec, req)
@@ -136,7 +131,6 @@ func TestJWTMiddlewareWrongToken(t *testing.T) {
 	req.Header.Add("Authorization", "Bearer "+"token")
 	r.Use(jwt.JwtContext)
 	r.Get(path, func(w http.ResponseWriter, r *http.Request) {
-		return
 	})
 
 	r.ServeHTTP(rec, req)
