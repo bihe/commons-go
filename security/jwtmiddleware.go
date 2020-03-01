@@ -50,17 +50,17 @@ func handleJWT(next http.Handler, options JwtOptions, errRep *errors.ErrorReport
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var (
-			err       error
-			token     string
-			refEncode string
+			err   error
+			token string
 		)
 
 		authHeader := r.Header.Get("Authorization")
-		refHeader := r.Header.Get("Referer")
-		if refHeader != "" {
-			refEncode = url.QueryEscape(refHeader)
+		reqUrl := r.URL.String()
+		if reqUrl != "" {
+			reqUrl = url.QueryEscape(reqUrl)
 		}
-		redirectUrl := fmt.Sprintf("%s&ref=%s", options.RedirectURL, refEncode)
+
+		redirectUrl := fmt.Sprintf("%s&ref=%s", options.RedirectURL, reqUrl)
 
 		if authHeader != "" {
 			token = strings.Replace(authHeader, "Bearer ", "", 1)
