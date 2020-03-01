@@ -7,6 +7,7 @@ import (
 
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -18,9 +19,6 @@ import (
 const (
 	// UserKey defines an authenticated user object stored in the context
 	UserKey = "context_user"
-
-	// DefaultErrorPath specifies the url-path where the HTML errors are displayed
-	DefaultErrorPath = "error"
 )
 
 // JwtMiddleware is used to authenticate a user based on a token
@@ -49,18 +47,21 @@ func (j *JwtMiddleware) JwtContext(next http.Handler) http.Handler {
 
 func handleJWT(next http.Handler, options JwtOptions, errRep *errors.ErrorReporter) http.Handler {
 	cache := NewMemCache(parseDuration(options.CacheDuration))
-	errorPath := options.ErrorPath
-	if errorPath == "" {
-		errorPath = DefaultErrorPath
-	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var (
-			err   error
-			token string
+			err       error
+			token     string
+			refEncode string
 		)
 
 		authHeader := r.Header.Get("Authorization")
+		refHeader := r.Header.Get("Referer")
+		if refHeader != "" {
+			refEncode = url.QueryEscape(refHeader)
+		}
+		redirectUrl := fmt.Sprintf("%s&ref=%s", options.RedirectURL, refEncode)
+
 		if authHeader != "" {
 			token = strings.Replace(authHeader, "Bearer ", "", 1)
 		}
@@ -74,7 +75,7 @@ func handleJWT(next http.Handler, options JwtOptions, errRep *errors.ErrorReport
 					Status:  http.StatusUnauthorized,
 					Err:     fmt.Errorf("invalid authentication, no JWT token present"),
 					Request: r,
-					URL:     options.RedirectURL + errorPath,
+					URL:     redirectUrl,
 				})
 				return
 			}
@@ -99,7 +100,7 @@ func handleJWT(next http.Handler, options JwtOptions, errRep *errors.ErrorReport
 				Status:  http.StatusUnauthorized,
 				Err:     fmt.Errorf("invalid authentication, could not parse the JWT token: %v", err),
 				Request: r,
-				URL:     options.RedirectURL + errorPath,
+				URL:     redirectUrl,
 			})
 			return
 		}
@@ -111,7 +112,7 @@ func handleJWT(next http.Handler, options JwtOptions, errRep *errors.ErrorReport
 				Status:  http.StatusForbidden,
 				Err:     fmt.Errorf("Invalid authorization: %v", err),
 				Request: r,
-				URL:     options.RedirectURL + errorPath,
+				URL:     redirectUrl,
 			})
 			return
 		}
