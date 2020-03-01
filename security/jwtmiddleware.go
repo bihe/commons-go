@@ -59,8 +59,8 @@ func handleJWT(next http.Handler, options JwtOptions, errRep *errors.ErrorReport
 		if reqUrl != "" {
 			reqUrl = url.QueryEscape(reqUrl)
 		}
-
-		redirectUrl := fmt.Sprintf("%s&ref=%s", options.RedirectURL, reqUrl)
+		// add request-Url and take care of url-encoding
+		redirectUrl := options.RedirectURL + "%26ref=" + reqUrl
 
 		if authHeader != "" {
 			token = strings.Replace(authHeader, "Bearer ", "", 1)
