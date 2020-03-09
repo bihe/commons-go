@@ -120,10 +120,10 @@ func TestErrorHandler(t *testing.T) {
 			if tc.Redirect != "" {
 				assert.Equal(t, tc.Redirect, rec.Header().Get("Location"))
 				// check that the correct cookie was set
-				assert.True(t, strings.Index(rec.Header().Get("Set-Cookie"), errRep.CookieSettings.Prefix+"_"+FlashKeyError) > -1)
+				assert.True(t, strings.Contains(rec.Header().Get("Set-Cookie"), errRep.CookieSettings.Prefix+"_"+FlashKeyError))
 				return
 			}
-			s = string(rec.Body.Bytes())
+			s = rec.Body.String()
 			if s != "" {
 				assert.NoError(t, json.Unmarshal(rec.Body.Bytes(), &pd))
 			}

@@ -1,5 +1,4 @@
 // Package handler provides common functions needed to create API handlers as well as some utilities
-
 package handler
 
 import (

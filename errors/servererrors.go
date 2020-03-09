@@ -1,3 +1,5 @@
+// Package errors provides RFC7807 problem-details and negotiates HTML or JSON responses
+// the HTML response is in the form of a redirect to an error page
 package errors
 
 import (
@@ -212,11 +214,15 @@ func (e *ErrorReporter) defaultConfig(r *http.Request) {
 
 // Negotiate respects content-types, sets the status code and returns error information
 func (e *ErrorReporter) Negotiate(w http.ResponseWriter, r *http.Request, err error) {
+	var (
+		pd          *ProblemDetail
+		redirectURL string
+	)
+
 	// not sure if a valid config was supplied, check and use defaults otherwise
 	e.defaultConfig(r)
-
-	var pd *ProblemDetail
 	content := negotiateContent(r)
+	redirectURL = e.ErrorPath
 
 	// default error is the server-error
 	if svrErr, ok := err.(ServerError); ok {
@@ -227,20 +233,7 @@ func (e *ErrorReporter) Negotiate(w http.ResponseWriter, r *http.Request, err er
 
 	if redirect, ok := err.(RedirectError); ok {
 		pd = ErrRedirectError(redirect)
-		switch content {
-		case HTML:
-			e.cookie.Set(FlashKeyError, pd.Detail, DefaultCookieExpiry, w)
-			http.Redirect(w, r, redirect.URL, http.StatusTemporaryRedirect)
-			break
-		default:
-			status := http.StatusTemporaryRedirect
-			if pd.Status > 0 {
-				status = pd.Status
-			}
-			writeProblemJSON(w, status, pd)
-			break
-		}
-		return
+		redirectURL = redirect.URL
 	}
 
 	if notfound, ok := err.(NotFoundError); ok {
@@ -258,15 +251,13 @@ func (e *ErrorReporter) Negotiate(w http.ResponseWriter, r *http.Request, err er
 	switch content {
 	case HTML:
 		e.cookie.Set(FlashKeyError, pd.Detail, DefaultCookieExpiry, w)
-		http.Redirect(w, r, e.ErrorPath, http.StatusTemporaryRedirect)
-		break
+		http.Redirect(w, r, redirectURL, http.StatusTemporaryRedirect)
 	default:
-		status := http.StatusTemporaryRedirect
+		status := http.StatusInternalServerError
 		if pd.Status > 0 {
 			status = pd.Status
 		}
 		writeProblemJSON(w, status, pd)
-		break
 	}
 }
 

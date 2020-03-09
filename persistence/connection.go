@@ -1,4 +1,4 @@
-// Package persistence simplifies the database ineraction by providing helper functions
+// Package persistence simplifies the database interaction by providing helper functions
 // it uses sqlx internally
 package persistence
 

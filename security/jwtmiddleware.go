@@ -1,5 +1,4 @@
 // Package security implements authentication / authorization by means of JWT tokens
-
 package security
 
 import (
