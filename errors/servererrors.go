@@ -1,14 +1,14 @@
 // Package errors provides RFC7807 problem-details and negotiates HTML or JSON responses
 // the HTML response is in the form of a redirect to an error page
-package errors
+package errors // import "golang.binggl.net/commons/errors"
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
 
-	"github.com/bihe/commons-go/cookies"
 	"github.com/markusthoemmes/goautoneg"
+	"golang.binggl.net/commons/cookies"
 
 	log "github.com/sirupsen/logrus"
 )

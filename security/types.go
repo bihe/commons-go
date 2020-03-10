@@ -1,4 +1,4 @@
-package security
+package security // import "golang.binggl.net/commons/security"
 
 // User is the authenticated principal extracted from the JWT token
 type User struct {

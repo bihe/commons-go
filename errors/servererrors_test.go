@@ -1,4 +1,4 @@
-package errors
+package errors // import "golang.binggl.net/commons/errors"
 
 import (
 	"encoding/json"
@@ -8,9 +8,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/bihe/commons-go/cookies"
 	"github.com/go-chi/chi"
 	"github.com/stretchr/testify/assert"
+	"golang.binggl.net/commons/cookies"
 )
 
 const errText = "error occurred"

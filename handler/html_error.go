@@ -1,4 +1,4 @@
-package handler
+package handler // import "golang.binggl.net/commons/handler"
 
 import (
 	"fmt"
@@ -8,8 +8,8 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/bihe/commons-go/cookies"
-	"github.com/bihe/commons-go/errors"
+	"golang.binggl.net/commons/cookies"
+	"golang.binggl.net/commons/errors"
 )
 
 const errorTemplate = "error.tmpl"

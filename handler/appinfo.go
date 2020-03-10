@@ -1,10 +1,10 @@
-package handler
+package handler // import "golang.binggl.net/commons/handler"
 
 import (
 	"net/http"
 
-	"github.com/bihe/commons-go/security"
 	"github.com/go-chi/render"
+	"golang.binggl.net/commons/security"
 )
 
 // --------------------------------------------------------------------------

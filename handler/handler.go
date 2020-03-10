@@ -1,13 +1,13 @@
 // Package handler provides common functions needed to create API handlers as well as some utilities
-package handler
+package handler // import "golang.binggl.net/commons/handler"
 
 import (
 	"fmt"
 	"net/http"
 
-	"github.com/bihe/commons-go/errors"
-	"github.com/bihe/commons-go/security"
 	log "github.com/sirupsen/logrus"
+	"golang.binggl.net/commons/errors"
+	"golang.binggl.net/commons/security"
 )
 
 // Handler defines common handler logic

@@ -1,5 +1,5 @@
 // Package security implements authentication / authorization by means of JWT tokens
-package security
+package security // import "golang.binggl.net/commons/security"
 
 import (
 	"context"
@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bihe/commons-go/cookies"
-	"github.com/bihe/commons-go/errors"
 	log "github.com/sirupsen/logrus"
+	"golang.binggl.net/commons/cookies"
+	"golang.binggl.net/commons/errors"
 )
 
 const (

@@ -1,6 +1,6 @@
 // Package persistence simplifies the database interaction by providing helper functions
 // it uses sqlx internally
-package persistence
+package persistence // import "golang.binggl.net/commons/persistence"
 
 import (
 	"fmt"

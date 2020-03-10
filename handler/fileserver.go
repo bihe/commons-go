@@ -1,4 +1,4 @@
-package handler
+package handler // import "golang.binggl.net/commons/handler"
 
 import (
 	"net/http"

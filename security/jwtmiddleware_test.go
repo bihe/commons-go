@@ -1,4 +1,4 @@
-package security
+package security // import "golang.binggl.net/commons/security"
 
 import (
 	"encoding/json"
@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/bihe/commons-go/cookies"
-	"github.com/bihe/commons-go/errors"
+	"golang.binggl.net/commons/cookies"
+	"golang.binggl.net/commons/errors"
 	"github.com/go-chi/chi"
 
 	"github.com/stretchr/testify/assert"

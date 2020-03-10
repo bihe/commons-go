@@ -1,4 +1,4 @@
-package security
+package security // import "golang.binggl.net/commons/security"
 
 import (
 	"testing"
