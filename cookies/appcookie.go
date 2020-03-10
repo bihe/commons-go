@@ -1,3 +1,5 @@
+// Package cookies is responsible to read and write cookies
+// based on a supplied configuration
 package cookies
 
 import (
